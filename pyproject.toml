@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "ultrasound-processing"
 version = "0.1.0"
-description = "PyTorch ultrasound body composition research pipeline"
+description = "PyTorch pipeline for newborn ultrasound body composition prediction"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [

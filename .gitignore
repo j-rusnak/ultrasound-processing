@@ -17,6 +17,7 @@ data/cropped_images/
 data/*.csv
 data/*.xlsx
 data/*.xls
+past-papers/
 artifacts/checkpoints/
 artifacts/results/
 artifacts/**/*.pt
