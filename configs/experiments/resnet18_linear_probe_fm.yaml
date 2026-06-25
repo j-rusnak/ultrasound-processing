@@ -1,0 +1,13 @@
+data:
+  region: BAQ
+  output: FM
+  number_of_images: 3
+
+model:
+  name: resnet18_linear_probe
+  freeze_backbone: true
+
+training:
+  epochs: 90
+  criterion: mse
+  learning_rate: 0.001

@@ -1,0 +1,12 @@
+data:
+  output: FM
+  image_size: 256
+  number_of_images: 3
+
+model:
+  name: multi_unet
+
+training:
+  epochs: 10
+  criterion: mse
+  learning_rate: 0.001
