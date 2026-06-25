@@ -1,0 +1,37 @@
+seed: 42
+device: cuda
+
+data:
+  image_root: data/cropped_images
+  labels_csv: data/Data_11.5.23_modified.csv
+  region: BAQ
+  output: FM
+  image_size: 256
+  number_of_images: 3
+  augment: 0
+  threshold: false
+  speckle: false
+  despeckle: false
+  crop: [1.0, 1.0, 1.0]
+  train_fraction: 0.9
+  test_patient_ids: []
+
+model:
+  name: unet
+  input_channels: 3
+  output_dim: 1
+  freeze_backbone: false
+
+training:
+  epochs: 90
+  batch_size: 1
+  learning_rate: 0.001
+  criterion: mse
+  adaptive_lr: true
+  scheduler_gamma: 0.95
+  use_weight_length: false
+  num_workers: 0
+
+artifacts:
+  checkpoint_dir: artifacts/checkpoints
+  results_dir: artifacts/results
