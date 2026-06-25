@@ -1,0 +1,13 @@
+data:
+  region: BA
+  output: FFM
+  number_of_images: 3
+
+model:
+  name: unet
+
+training:
+  epochs: 90
+  criterion: mse
+  learning_rate: 0.001
+  use_weight_length: false

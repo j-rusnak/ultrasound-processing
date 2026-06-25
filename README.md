@@ -65,6 +65,18 @@ The image folder should contain one subfolder per `Study_ID`. Each patient shoul
 
 ## Common Experiments
 
+List the UMB-style region-grid commands without running them:
+
+```powershell
+python scripts/run_region_grid.py --dry-run
+```
+
+Run training and evaluation for the full region grid after data is available:
+
+```powershell
+python scripts/run_region_grid.py --train --evaluate
+```
+
 Train the baseline modified U-Net for FM from all three regions:
 
 ```powershell
@@ -107,6 +119,24 @@ Summarize prediction metrics:
 python scripts/run_stats.py --predictions artifacts/results/predictions.csv
 ```
 
+Export a UMB-style anatomical region table from prediction CSVs:
+
+```powershell
+python scripts/export_region_grid_results.py --predictions-dir artifacts/results/region_grid
+```
+
+Generate a batch Grad-CAM HTML report:
+
+```powershell
+python scripts/gradcam_report.py --config configs/experiments/unet_fm_baq.yaml --checkpoint artifacts/checkpoints/model.pt --image-list docs/gradcam_image_list_example.csv --target-layer outc
+```
+
+Training and evaluation scripts append run metadata to:
+
+```text
+artifacts/results/runs.jsonl
+```
+
 ## Project Layout
 
 ```text
@@ -118,6 +148,10 @@ scripts/                  Thin CLI entrypoints
 src/ultrasound_processing/ Reusable package code
 tests/                    Synthetic-data unit tests
 ```
+
+## Reproducibility and CI
+
+See [docs/reproducibility.md](docs/reproducibility.md) for the recommended experiment workflow. GitHub Actions runs the synthetic-data test suite and CLI dry-runs on push and pull request.
 
 ## Notes
 

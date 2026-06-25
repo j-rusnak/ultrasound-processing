@@ -14,6 +14,7 @@ from ultrasound_processing.config import load_config, resolve_project_path
 from ultrasound_processing.evaluation.predict import predict_batches, write_predictions
 from ultrasound_processing.evaluation.statistics import summarize_predictions
 from ultrasound_processing.pipeline import build_loader, build_prediction_dataset, configured_device, model_from_config
+from ultrasound_processing.tracking import append_run_record, current_git_commit, default_split_id
 from ultrasound_processing.training.checkpoints import load_checkpoint
 
 
@@ -42,7 +43,20 @@ def main() -> None:
     rows = predict_batches(model, loader, device=device)
     output = Path(args.output) if args.output else resolve_project_path(config["artifacts"]["results_dir"], base_dir=ROOT) / "predictions.csv"
     write_predictions(rows, output)
-    print(json.dumps({"predictions": str(output), "metrics": summarize_predictions(output)}, indent=2))
+    metrics = summarize_predictions(output)
+    run_log = resolve_project_path(config["artifacts"]["results_dir"], base_dir=ROOT) / "runs.jsonl"
+    record = append_run_record(
+        run_log,
+        event="evaluate",
+        config=config,
+        metrics=metrics,
+        checkpoint_path=args.checkpoint,
+        predictions_path=output,
+        split_id=default_split_id(config),
+        command=" ".join(sys.argv),
+        git_commit=current_git_commit(ROOT),
+    )
+    print(json.dumps({"predictions": str(output), "metrics": metrics, "run_id": record["run_id"]}, indent=2))
 
 
 if __name__ == "__main__":

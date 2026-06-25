@@ -11,6 +11,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from ultrasound_processing.config import load_config, resolve_project_path
 from ultrasound_processing.pipeline import build_datasets, build_loader, configured_device, model_from_config
+from ultrasound_processing.tracking import append_run_record, current_git_commit, default_split_id
 from ultrasound_processing.training.checkpoints import save_checkpoint
 from ultrasound_processing.training.trainer import set_seed, train_model
 
@@ -18,6 +19,7 @@ from ultrasound_processing.training.trainer import set_seed, train_model
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", required=True)
+    parser.add_argument("--checkpoint-output")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
 
@@ -36,15 +38,31 @@ def main() -> None:
 
     checkpoint_dir = resolve_project_path(config["artifacts"]["checkpoint_dir"], base_dir=ROOT)
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    checkpoint_path = checkpoint_dir / f"{config['model']['name']}_{config['data']['output']}_{stamp}.pt"
+    checkpoint_path = (
+        resolve_project_path(args.checkpoint_output, base_dir=ROOT)
+        if args.checkpoint_output
+        else checkpoint_dir / f"{config['model']['name']}_{config['data']['output']}_{stamp}.pt"
+    )
+    metrics = {"train_loss": history["train_loss"][-1], "validation_loss": history["validation_loss"][-1]}
     save_checkpoint(
         checkpoint_path,
         model=model,
         epoch=int(config["training"]["epochs"]),
         config=config,
-        metrics={"train_loss": history["train_loss"][-1], "validation_loss": history["validation_loss"][-1]},
+        metrics=metrics,
     )
-    print(json.dumps({"checkpoint": str(checkpoint_path), "history": history}, indent=2))
+    run_log = resolve_project_path(config["artifacts"]["results_dir"], base_dir=ROOT) / "runs.jsonl"
+    record = append_run_record(
+        run_log,
+        event="train",
+        config=config,
+        metrics=metrics,
+        checkpoint_path=checkpoint_path,
+        split_id=default_split_id(config),
+        command=" ".join(sys.argv),
+        git_commit=current_git_commit(ROOT),
+    )
+    print(json.dumps({"checkpoint": str(checkpoint_path), "history": history, "run_id": record["run_id"]}, indent=2))
 
 
 if __name__ == "__main__":

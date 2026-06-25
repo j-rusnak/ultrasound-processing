@@ -1,0 +1,4 @@
+patient_id,region,image_path
+58041919,A,data/cropped_images/58041919/58041919_AB1_R.jpg
+58041919,B,data/cropped_images/58041919/58041919_BICEP1_R.jpg
+58041919,Q,data/cropped_images/58041919/58041919_QUAD1_R.jpg
